@@ -32,23 +32,30 @@ export default async function RootLayout({
   const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
   
-  const { data: { session } } = await supabase.auth.getSession()
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased min-h-screen bg-background`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="relative flex min-h-screen flex-col">
-            <Navbar user={session?.user} />
-            <main className="flex-1">{children}</main>
-          </div>
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${inter.className} antialiased min-h-screen bg-background`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="relative flex min-h-screen flex-col">
+              <Navbar user={session?.user} />
+              <main className="flex-1">{children}</main>
+            </div>
+          </ThemeProvider>
+        </body>
+      </html>
+    )
+  } catch (error) {
+    console.error('Error:', error)
+    return null
+  }
 }

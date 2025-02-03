@@ -67,6 +67,8 @@
   }
 }
 
+/* ... existing styles ... */
+
 /* Remove autofill background color */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

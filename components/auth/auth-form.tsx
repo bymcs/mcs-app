@@ -1,37 +1,38 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Icons } from "@/components/icons"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Icons } from "@/components/icons";
 
 export function AuthForm({ type }: { type: "login" | "register" }) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const router = useRouter()
-  const supabase = createClientComponentClient()
-
-  console.log(supabase)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const supabase = createClientComponentClient();
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
 
     try {
       if (type === "login") {
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: password.trim(),
-        })
-        if (error) throw error
+        });
+        if (error) throw error;
       } else {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -39,21 +40,21 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
           options: {
             emailRedirectTo: `${location.origin}/auth/callback`,
           },
-        })
-        if (error) throw error
+        });
+        if (error) throw error;
+        setSuccess("Check your email for the confirmation link.");
+        return;
       }
 
       if (type === "login") {
-        router.refresh()
-        router.push("/dashboard")
-      } else {
-        setError("Check your email for the confirmation link.")
-        return
+        router.refresh();
+        router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred during authentication")
+      // Supabase'den gelen hata mesajını doğrudan gösteriyoruz.
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -110,17 +111,30 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               </div>
             </div>
           </div>
+
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-md">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <Icons.alert className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
+
+          {success && (
+            <Alert>
+              <Icons.check className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+
           <Button className="h-11 font-medium" disabled={loading}>
             {loading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
             {type === "login" ? "Sign In" : "Create Account"}
           </Button>
         </div>
       </form>
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
@@ -131,10 +145,12 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
           </span>
         </div>
       </div>
+
       <Button variant="outline" className="h-11 font-medium" disabled={loading}>
         <Icons.gitHub className="mr-2 h-4 w-4" />
         GitHub
       </Button>
+
       <p className="text-sm text-center text-muted-foreground">
         {type === "login" ? (
           <>
@@ -153,5 +169,5 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         )}
       </p>
     </div>
-  )
-} 
+  );
+}

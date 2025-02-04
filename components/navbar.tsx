@@ -39,7 +39,7 @@ export function Navbar({ user: initialUser }: { user: any }) {
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="font-bold text-xl">
+          <Link href="/" className="font-bold text-2xl">
             BYMCS
           </Link>
 

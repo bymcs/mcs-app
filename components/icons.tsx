@@ -5,6 +5,7 @@ import {
   Github,
   AlertCircle,
   Check,
+  Info,
   type Icon as LucideIcon,
 } from "lucide-react"
 
@@ -16,5 +17,6 @@ export const Icons = {
   spinner: Loader2,
   gitHub: Github,
   alert: AlertCircle,
-  check: Check
+  check: Check,
+  info: Info,
 } 

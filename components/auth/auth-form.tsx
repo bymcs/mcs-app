@@ -9,6 +9,9 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icons } from "@/components/icons";
+ 
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 export function AuthForm({ type }: { type: "login" | "register" }) {
   const [email, setEmail] = useState("");
@@ -19,6 +22,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const supabase = createClientComponentClient();
+  const { toast } = useToast()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +37,10 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
           password: password.trim(),
         });
         if (error) throw error;
+        toast({
+          title: "Success!",
+          description: "You have successfully logged in.",
+        })
       } else {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -43,6 +51,10 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         });
         if (error) throw error;
         setSuccess("Check your email for the confirmation link.");
+                toast({
+          title: "Success!",
+          description: "You have successfully logged in.",
+        })
         return;
       }
 

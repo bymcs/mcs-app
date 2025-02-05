@@ -34,8 +34,8 @@ export default async function RootLayout({
   
   try {
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser()
 
     return (
       <html lang="en" suppressHydrationWarning>
@@ -47,7 +47,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <div className="relative flex min-h-screen flex-col">
-              <Navbar user={session?.user} />
+              <Navbar user={user} />
               <main className="flex-1">{children}</main>
             </div>
           </ThemeProvider>

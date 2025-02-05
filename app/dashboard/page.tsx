@@ -11,8 +11,9 @@ export default async function DashboardPage() {
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
   
   const { data: { session }, error } = await supabase.auth.getSession()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
   
-  if (error || !session) {
+  if (error || !session || userError || !user) {
     return redirect('/login')
   }
 
@@ -20,7 +21,7 @@ export default async function DashboardPage() {
     <div className="container mx-auto p-4">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {session.user.email}</p>
+        <p className="text-muted-foreground">Welcome back, {user.email}</p>
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

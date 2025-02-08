@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
+import { Icons } from "@/components/icons"
 
 export function Navbar({ user: initialUser }: { user: any }) {
   const router = useRouter()
@@ -60,20 +61,30 @@ export function Navbar({ user: initialUser }: { user: any }) {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
-                <Button variant="ghost" asChild>
-                  <Link href="/dashboard">Dashboard</Link>
+                <Button variant="default" asChild>
+                  <Link href="/dashboard" className="flex items-center">
+                    <Icons.info className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
                 </Button>
-                <Button variant="outline" onClick={handleSignOut}>
+                <Button variant="outline" onClick={handleSignOut} className="flex items-center">
+                  <Icons.loguot className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" asChild>
-                  <Link href="/login">Sign In</Link>
+                <Button variant="outline" asChild>
+                  <Link href="/login" className="flex items-center">
+                    <Icons.login className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/register">Sign Up</Link>
+                  <Link href="/register" className="flex items-center">
+                    <Icons.userplus className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </Link>
                 </Button>
               </>
             )}
@@ -91,35 +102,45 @@ export function Navbar({ user: initialUser }: { user: any }) {
                   className="w-full justify-start"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/dashboard" className="flex items-center">
+                    <Icons.info className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start flex items-center"
                   onClick={() => {
                     handleSignOut()
                     setIsMenuOpen(false)
                   }}
                 >
+                  <Icons.loguot className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
               </>
             ) : (
               <>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   asChild
                   className="w-full justify-start"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/login">Sign In</Link>
+                  <Link href="/login" className="flex items-center">
+                    <Icons.login className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Link>
                 </Button>
                 <Button
                   asChild
                   className="w-full justify-start"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/register">Sign Up</Link>
+                  <Link href="/register" className="flex items-center">
+                    <Icons.userplus className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </Link>
                 </Button>
               </>
             )}
@@ -128,4 +149,4 @@ export function Navbar({ user: initialUser }: { user: any }) {
       </div>
     </nav>
   )
-} 
+}

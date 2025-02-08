@@ -6,6 +6,10 @@ import {
   AlertCircle,
   Check,
   Info,
+  UserRoundPlus,
+  LogIn,
+  LogOut,
+  
   type Icon as LucideIcon,
 } from "lucide-react"
 
@@ -19,4 +23,7 @@ export const Icons = {
   alert: AlertCircle,
   check: Check,
   info: Info,
+  userplus: UserRoundPlus,
+  login: LogIn,
+  loguot: LogOut,
 } 

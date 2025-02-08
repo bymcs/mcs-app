@@ -32,15 +32,21 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
 
     try {
       if (type === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: password.trim(),
         });
+        
         if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "You have successfully logged in.",
-        })
+        
+        if (data.session) {
+          toast({
+            title: "Success!",
+            description: "You have successfully logged in.",
+          });
+          router.refresh();
+          router.push("/dashboard");
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -49,22 +55,22 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
             emailRedirectTo: `${location.origin}/auth/callback`,
           },
         });
+        
         if (error) throw error;
+        
         setSuccess("Check your email for the confirmation link.");
-                toast({
+        toast({
           title: "Success!",
-          description: "You have successfully logged in.",
-        })
-        return;
-      }
-
-      if (type === "login") {
-        router.refresh();
-        router.push("/dashboard");
+          description: "Please check your email to verify your account.",
+        });
       }
     } catch (err: any) {
-      // Supabase'den gelen hata mesajını doğrudan gösteriyoruz.
       setError(err.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -123,6 +129,17 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               </div>
             </div>
           </div>
+
+          {type === "login" && (
+            <div className="flex items-center justify-end">
+              <Link
+                href="/reset-password"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          )}
 
           {error && (
             <Alert variant="destructive">

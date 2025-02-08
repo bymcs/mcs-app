@@ -6,6 +6,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import type { Metadata } from "next"
 import { Navbar } from "@/components/navbar"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,14 +14,8 @@ const inter = Inter({
   variable: "--font-inter",
 })
 
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: 'swap',
-  variable: "--font-jetbrains-mono",
-})
-
 export const metadata: Metadata = {
-  title: "MCS App",
+  title: "mcs-app",
   description: "Modern web application built with Next.js and Supabase",
 }
 
@@ -50,12 +45,30 @@ export default async function RootLayout({
               <Navbar user={user} />
               <main className="flex-1">{children}</main>
             </div>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
     )
   } catch (error) {
     console.error('Error:', error)
-    return null
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${inter.className} antialiased min-h-screen bg-background`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="relative flex min-h-screen flex-col">
+              <Navbar user={null} />
+              <main className="flex-1">{children}</main>
+            </div>
+            <Toaster />
+          </ThemeProvider>
+        </body>
+      </html>
+    )
   }
 }

@@ -99,9 +99,13 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
             <Icons.settings className="mr-2 h-4 w-4" />
             Settings
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/dashboard/tasks')}>
+            <Icons.check className="mr-2 h-4 w-4" />
+            Tasks
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
           <Icons.loguot className="mr-2 h-4 w-4" />
           Log out
         </DropdownMenuItem>

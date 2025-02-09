@@ -9,7 +9,9 @@ import {
   UserRoundPlus,
   LogIn,
   LogOut,
-  
+  User,
+  Settings,
+  Home,
   type Icon as LucideIcon,
 } from "lucide-react"
 
@@ -26,4 +28,7 @@ export const Icons = {
   userplus: UserRoundPlus,
   login: LogIn,
   loguot: LogOut,
+  user: User,
+  settings: Settings,
+  home: Home,
 } 

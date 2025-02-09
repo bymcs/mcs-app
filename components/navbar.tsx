@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { Icons } from "@/components/icons"
+import { UserNav } from "@/components/user-nav"
 
 export function Navbar({ user: initialUser }: { user: any }) {
   const router = useRouter()
@@ -60,18 +61,7 @@ export function Navbar({ user: initialUser }: { user: any }) {
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <>
-                <Button variant="default" asChild>
-                  <Link href="/dashboard" className="flex items-center">
-                    <Icons.info className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </Button>
-                <Button variant="outline" onClick={handleSignOut} className="flex items-center">
-                  <Icons.loguot className="mr-2 h-4 w-4" />
-                  Sign Out
-                </Button>
-              </>
+              <UserNav user={user} />
             ) : (
               <>
                 <Button variant="outline" asChild>
@@ -93,34 +83,11 @@ export function Navbar({ user: initialUser }: { user: any }) {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-2">
+          <div className="md:hidden py-4 space-y-2"> {/* space-y-2 eklendi */}
             {user ? (
-              <>
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="w-full justify-start"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Link href="/dashboard" className="flex items-center">
-                    <Icons.info className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start flex items-center"
-                  onClick={() => {
-                    handleSignOut()
-                    setIsMenuOpen(false)
-                  }}
-                >
-                  <Icons.loguot className="mr-2 h-4 w-4" />
-                  Sign Out
-                </Button>
-              </>
+              <UserNav user={user} isMobile={true} />
             ) : (
-              <>
+              <div className="space-y-2"> {/* Butonları sarmak için div eklendi */}
                 <Button
                   variant="outline"
                   asChild
@@ -142,7 +109,7 @@ export function Navbar({ user: initialUser }: { user: any }) {
                     Sign Up
                   </Link>
                 </Button>
-              </>
+              </div>
             )}
           </div>
         )}

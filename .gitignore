@@ -30,6 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+<<<<<<< HEAD
+=======
+# env files (can opt-in for committing if needed)
+.env*
+
+>>>>>>> fc5f497 (feat: update task schema for simplicity, enhance navbar with user navigation, and add 404 not found page)
 # vercel
 .vercel
 

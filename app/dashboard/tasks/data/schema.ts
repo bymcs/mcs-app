@@ -1,17 +1,13 @@
 import { z } from "zod"
 
-// Define the task schema
+// We're keeping a simple non-relational schema here.
+// IRL, you will have a schema for your data models.
 export const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
-  status: z.enum(["backlog", "todo", "in_progress", "done", "canceled"]),
-  label: z.enum(["bug", "feature", "documentation", "enhancement"]),
-  priority: z.enum(["low", "medium", "high", "urgent"]),
-  assignee: z.string().optional(),
-  description: z.string().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime()
+  status: z.string(),
+  label: z.string(),
+  priority: z.string(),
 })
 
-// Export type for TypeScript usage
 export type Task = z.infer<typeof taskSchema>

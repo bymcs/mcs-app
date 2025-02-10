@@ -5,12 +5,7 @@ export const createClient = () => {
     options: {
       db: {
         schema: 'public',
-      },
-      auth: { 
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-      },
+      }
     },
   })
 }

@@ -9,9 +9,11 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icons } from "@/components/icons";
- 
+
 import { useToast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+
+import { useEffect } from "react";
 
 export function AuthForm({ type }: { type: "login" | "register" }) {
   const [email, setEmail] = useState("");
@@ -20,6 +22,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
   const router = useRouter();
   const supabase = createClientComponentClient();
   const { toast } = useToast()
@@ -75,6 +78,54 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
       setLoading(false);
     }
   }
+
+  const handleGitHubSignIn = async () => {
+    setGithubLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "GitHub Yönlendirmesi",
+        description: "GitHub hesabınıza yönlendiriliyorsunuz...",
+        variant: "default"
+      });
+
+    } catch (error: any) {
+      console.error('GitHub authentication error:', error);
+      
+      const errorMessages: { [key: string]: string } = {
+        'Multiple accounts': "Bu e-posta adresi zaten kayıtlı. Lütfen giriş yapın veya farklı bir hesap kullanın.",
+        'Authentication failed': "GitHub doğrulaması başarısız oldu. Lütfen tekrar deneyin.",
+        'Connection error': "Bağlantı hatası. İnternet bağlantınızı kontrol edin."
+      };
+
+      const errorMessage = errorMessages[error.message] || "GitHub ile giriş yapılırken bir hata oluştu.";
+
+      toast({
+        title: "Hata",
+        description: errorMessage,
+        variant: "destructive",
+        action: type === "register" ? (
+          <ToastAction altText="Giriş Yap" onClick={() => router.push("/auth/login")}>
+            Giriş Yap
+          </ToastAction>
+        ) : undefined
+      });
+    } finally {
+      setGithubLoading(false);
+    }
+  };
 
   return (
     <div className="grid gap-6">
@@ -175,9 +226,18 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         </div>
       </div>
 
-      <Button variant="outline" className="h-11 font-medium" disabled={loading}>
-        <Icons.gitHub className="mr-2 h-4 w-4" />
-        GitHub
+      <Button 
+        variant="outline" 
+        className="h-11 font-medium" 
+        disabled={loading || githubLoading} 
+        onClick={handleGitHubSignIn}
+      >
+        {githubLoading ? (
+          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Icons.gitHub className="mr-2 h-4 w-4" />
+        )}
+        GitHub ile {type === "login" ? "Giriş Yap" : "Kayıt Ol"}
       </Button>
 
       <p className="text-sm text-center text-muted-foreground">

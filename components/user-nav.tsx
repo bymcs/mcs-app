@@ -33,8 +33,14 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
       <div className="space-y-2">
         <div className="px-2 py-1.5 flex items-center gap-2">
           <Avatar className="h-7 w-7">
-            <AvatarImage src={user?.user_metadata?.avatar_url || "https://avatars.githubusercontent.com/u/56798318"} alt={user?.email} />
+            <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt={user?.email} />
+            <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
+            {(user?.user_metadata?.full_name) && (
+            <p className="text-sm font-medium leading-none">
+              {user?.user_metadata?.full_name || user?.email}
+            </p>
+            )}
           <p className="text-xs font-medium text-muted-foreground">{user?.email}</p>
         </div>
         <div className="border-t my-2" />
@@ -76,7 +82,7 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user?.user_metadata?.avatar_url || "https://avatars.githubusercontent.com/u/56798318"} alt={user?.email} />
+            <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt={user?.email} />
             <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
@@ -84,6 +90,11 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
+            {(user?.user_metadata?.full_name) && (
+              <p className="text-sm font-medium leading-none">
+                {user?.user_metadata?.full_name || user?.email}
+              </p>
+            )}
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>

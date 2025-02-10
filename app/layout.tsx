@@ -6,6 +6,8 @@ import type { Metadata } from "next"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { QueryProvider } from "@/providers/query-provider"
+import { ErrorProvider } from "@/providers/error-provider";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,11 +42,14 @@ export default async function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <ErrorProvider>
               <div className="relative flex min-h-screen flex-col">
                 <Navbar user={user} />
                 <main className="flex-1">{children}</main>
               </div>
+              
               <Toaster />
+              </ErrorProvider>
             </ThemeProvider>
           </QueryProvider>
         </body>
@@ -62,11 +67,13 @@ export default async function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <ErrorProvider>
               <div className="relative flex min-h-screen flex-col">
                 <Navbar user={null} />
                 <main className="flex-1">{children}</main>
               </div>
               <Toaster />
+              </ErrorProvider>
             </ThemeProvider>
           </QueryProvider>
         </body>

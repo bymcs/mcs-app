@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
@@ -12,57 +12,55 @@ import { toast } from "@/hooks/use-toast"
 import { Icons } from "@/components/icons"
 import { useSupabase } from "@/hooks/use-supabase"
 
-const updatePasswordSchema = z.object({
+const loginSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Şifreler eşleşmiyor",
-  path: ["confirmPassword"],
 })
 
-type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>
+type LoginValues = z.infer<typeof loginSchema>
 
-export function UpdatePasswordForm() {
+export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
   const { supabase } = useSupabase()
 
-  const form = useForm<UpdatePasswordValues>({
-    resolver: zodResolver(updatePasswordSchema),
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
+      email: "",
       password: "",
-      confirmPassword: "",
     },
   })
 
-  async function onSubmit(data: UpdatePasswordValues) {
+  async function onSubmit(data: LoginValues) {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
         password: data.password,
       })
 
       if (error) {
         toast({
           variant: "destructive",
-          title: "Şifre güncelleme başarısız",
+          title: "Giriş başarısız",
           description: error.message,
         })
         return
       }
 
       toast({
-        title: "Şifre güncelleme başarılı",
-        description: "Yeni şifrenizle giriş yapabilirsiniz.",
+        title: "Giriş başarılı",
+        description: "Yönlendiriliyorsunuz...",
       })
 
-      await supabase.auth.signOut()
-      router.push("/auth/login")
+      router.refresh()
+      router.push("/dashboard")
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Şifre güncelleme başarısız",
+        title: "Giriş başarısız",
         description: "Bir hata oluştu. Lütfen tekrar deneyin.",
       })
     } finally {
@@ -75,11 +73,30 @@ export function UpdatePasswordForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="password">Yeni Şifre</Label>
+            <Label htmlFor="email">E-posta</Label>
+            <Input
+              id="email"
+              placeholder="ornek@firma.com"
+              type="email"
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect="off"
+              disabled={isLoading}
+              {...form.register("email")}
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password">Şifre</Label>
             <Input
               id="password"
               type="password"
-              autoComplete="new-password"
+              autoComplete="current-password"
               disabled={isLoading}
               {...form.register("password")}
             />
@@ -90,30 +107,14 @@ export function UpdatePasswordForm() {
             )}
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="confirmPassword">Yeni Şifre Tekrar</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              disabled={isLoading}
-              {...form.register("confirmPassword")}
-            />
-            {form.formState.errors.confirmPassword && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-
           <Button type="submit" disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Şifreyi Güncelle
+            Giriş Yap
           </Button>
         </div>
       </form>
     </div>
   )
-}
+} 

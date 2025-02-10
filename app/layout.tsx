@@ -1,12 +1,11 @@
 import { Inter } from "next/font/google"
-import { JetBrains_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createServerClient } from "@/lib/supabase/server"
 import type { Metadata } from "next"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
+import { QueryProvider } from "@/providers/query-provider"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,8 +14,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "mcs-app",
-  description: "Modern web application built with Next.js and Supabase",
+  title: "MCS App",
+  description: "Modern Cloud Solutions Application",
 }
 
 export default async function RootLayout({
@@ -24,8 +23,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createServerClient()
   
   try {
     const {
@@ -33,40 +31,44 @@ export default async function RootLayout({
     } = await supabase.auth.getUser()
 
     return (
-      <html lang="en" suppressHydrationWarning>
+      <html lang="tr" suppressHydrationWarning>
         <body className={`${inter.className} antialiased min-h-screen bg-background`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div className="relative flex min-h-screen flex-col">
-              <Navbar user={user} />
-              <main className="flex-1">{children}</main>
-            </div>
-            <Toaster />
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className="relative flex min-h-screen flex-col">
+                <Navbar user={user} />
+                <main className="flex-1">{children}</main>
+              </div>
+              <Toaster />
+            </ThemeProvider>
+          </QueryProvider>
         </body>
       </html>
     )
   } catch (error) {
     console.error('Error:', error)
     return (
-      <html lang="en" suppressHydrationWarning>
+      <html lang="tr" suppressHydrationWarning>
         <body className={`${inter.className} antialiased min-h-screen bg-background`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div className="relative flex min-h-screen flex-col">
-              <Navbar user={null} />
-              <main className="flex-1">{children}</main>
-            </div>
-            <Toaster />
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className="relative flex min-h-screen flex-col">
+                <Navbar user={null} />
+                <main className="flex-1">{children}</main>
+              </div>
+              <Toaster />
+            </ThemeProvider>
+          </QueryProvider>
         </body>
       </html>
     )

@@ -31,7 +31,10 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
   if (isMobile) {
     return (
       <div className="space-y-2">
-        <div className="px-2 py-1.5">
+        <div className="px-2 py-1.5 flex items-center gap-2">
+          <Avatar className="h-7 w-7">
+            <AvatarImage src={user?.user_metadata?.avatar_url || "https://avatars.githubusercontent.com/u/56798318"} alt={user?.email} />
+          </Avatar>
           <p className="text-xs font-medium text-muted-foreground">{user?.email}</p>
         </div>
         <div className="border-t my-2" />
@@ -57,13 +60,14 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start"
+          className="w-full justify-start text-red-500"
           onClick={handleSignOut}
         >
           <Icons.loguot className="mr-2 h-4 w-4" />
           Sign Out
         </Button>
       </div>
+
     )
   }
 
@@ -72,7 +76,7 @@ export function UserNav({ user, isMobile }: { user: any; isMobile?: boolean }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user?.user_metadata?.avatar_url || "/avatars/default.png"} alt={user?.email} />
+            <AvatarImage src={user?.user_metadata?.avatar_url || "https://avatars.githubusercontent.com/u/56798318"} alt={user?.email} />
             <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>

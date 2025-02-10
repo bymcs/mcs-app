@@ -7,35 +7,29 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code")
   const type = requestUrl.searchParams.get("type")
 
+  if (!code) {
+    return NextResponse.redirect(new URL("/auth/login", requestUrl.origin))
+  }
+
   const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-  // Handle password recovery flow
-  if (type === "PASSWORD_RECOVERY" && code) {
-    try {
-      // Exchange code for session
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
-      if (error) throw error
+  try {
+    // Exchange code for session
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) throw error
 
-      // Redirect to update password page after successful code exchange
-      return NextResponse.redirect(new URL("/update-password", requestUrl.origin))
-    } catch (error) {
-      return NextResponse.redirect(
-        new URL("/login?error=Invalid or expired password reset link", requestUrl.origin)
-      )
+    // Handle password recovery flow
+    if (type === "PASSWORD_RECOVERY") {
+      return NextResponse.redirect(new URL("/auth/update-password", requestUrl.origin))
     }
-  }
 
-  // Handle normal auth callback
-  if (code) {
-    try {
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
-      if (error) throw error
-      return NextResponse.redirect(new URL("/dashboard", requestUrl.origin))
-    } catch (error) {
-      return NextResponse.redirect(new URL("/login", requestUrl.origin))
-    }
+    // Handle normal auth callback
+    return NextResponse.redirect(new URL("/dashboard", requestUrl.origin))
+  } catch (error) {
+    console.error("Auth callback error:", error)
+    return NextResponse.redirect(
+      new URL("/auth/login?error=Auth callback failed", requestUrl.origin)
+    )
   }
-
-  return NextResponse.redirect(new URL("/login", requestUrl.origin))
 }

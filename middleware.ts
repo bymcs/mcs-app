@@ -2,54 +2,50 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Public routes - authentication not required
-const publicRoutes = ['/login', '/register', '/', '/reset-password']
+const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/auth/reset-password', '/']
+const AUTH_ROUTES = ['/auth/callback', '/auth/update-password']
 
-// Protected routes - authentication required
-const protectedRoutes = ['/dashboard']
-
-// Auth flow routes - special handling required
-const authFlowRoutes = ['/auth/callback', '/update-password']
-
-export async function middleware(req: NextRequest) {
+export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-  const path = req.nextUrl.pathname
+  const supabase = createMiddlewareClient({ req: request, res })
+  const { pathname } = request.nextUrl
 
-  // Public routes are always accessible
-  if (publicRoutes.includes(path)) {
-    return res
-  }
+  try {
+    // Oturum kontrolü
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  // Handle auth flow routes
-  if (authFlowRoutes.includes(path)) {
-    if (path === '/auth/callback') {
-      const { searchParams } = new URL(req.url)
-      const code = searchParams.get('code')
+    // Public route kontrolü
+    const isPublicRoute = PUBLIC_ROUTES.includes(pathname)
+    const isAuthRoute = AUTH_ROUTES.includes(pathname)
+
+    // Auth callback işlemi
+    if (pathname === '/auth/callback') {
+      const code = request.nextUrl.searchParams.get('code')
       if (code) return res
+      return NextResponse.redirect(new URL('/auth/login', request.url))
     }
 
-    if (path === '/update-password') {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) return res
+    // Oturum yoksa ve public route değilse login'e yönlendir
+    if (!session && !isPublicRoute && !isAuthRoute) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
     }
 
-    return NextResponse.redirect(new URL('/login', req.url))
+    // Oturum varsa ve public route ise dashboard'a yönlendir
+    if (session && isPublicRoute) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    return res
+  } catch (error) {
+    console.error('Middleware error:', error)
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
-
-  // Protected routes require authentication
-  if (protectedRoutes.includes(path)) {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-  }
-
-  return res
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.).*)',
   ],
 }

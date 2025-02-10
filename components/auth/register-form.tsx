@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
@@ -12,7 +12,8 @@ import { toast } from "@/hooks/use-toast"
 import { Icons } from "@/components/icons"
 import { useSupabase } from "@/hooks/use-supabase"
 
-const updatePasswordSchema = z.object({
+const registerSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -20,49 +21,53 @@ const updatePasswordSchema = z.object({
   path: ["confirmPassword"],
 })
 
-type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>
+type RegisterValues = z.infer<typeof registerSchema>
 
-export function UpdatePasswordForm() {
+export function RegisterForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
   const { supabase } = useSupabase()
 
-  const form = useForm<UpdatePasswordValues>({
-    resolver: zodResolver(updatePasswordSchema),
+  const form = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      email: "",
       password: "",
       confirmPassword: "",
     },
   })
 
-  async function onSubmit(data: UpdatePasswordValues) {
+  async function onSubmit(data: RegisterValues) {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
         password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
 
       if (error) {
         toast({
           variant: "destructive",
-          title: "Şifre güncelleme başarısız",
+          title: "Kayıt başarısız",
           description: error.message,
         })
         return
       }
 
       toast({
-        title: "Şifre güncelleme başarılı",
-        description: "Yeni şifrenizle giriş yapabilirsiniz.",
+        title: "Kayıt başarılı",
+        description: "E-posta adresinize doğrulama bağlantısı gönderildi.",
       })
 
-      await supabase.auth.signOut()
-      router.push("/auth/login")
+      router.push("/auth/verify-email")
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Şifre güncelleme başarısız",
+        title: "Kayıt başarısız",
         description: "Bir hata oluştu. Lütfen tekrar deneyin.",
       })
     } finally {
@@ -75,7 +80,26 @@ export function UpdatePasswordForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="password">Yeni Şifre</Label>
+            <Label htmlFor="email">E-posta</Label>
+            <Input
+              id="email"
+              placeholder="ornek@firma.com"
+              type="email"
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect="off"
+              disabled={isLoading}
+              {...form.register("email")}
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password">Şifre</Label>
             <Input
               id="password"
               type="password"
@@ -91,7 +115,7 @@ export function UpdatePasswordForm() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="confirmPassword">Yeni Şifre Tekrar</Label>
+            <Label htmlFor="confirmPassword">Şifre Tekrar</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -110,10 +134,10 @@ export function UpdatePasswordForm() {
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Şifreyi Güncelle
+            Kayıt Ol
           </Button>
         </div>
       </form>
     </div>
   )
-}
+} 

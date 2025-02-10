@@ -1,93 +1,97 @@
 "use client"
 
-import { useState } from "react"
+import * as React from "react"
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { toast } from "@/hooks/use-toast"
 import { Icons } from "@/components/icons"
-import { useToast } from "@/hooks/use-toast"
+import { useSupabase } from "@/hooks/use-supabase"
+
+const resetSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
+})
+
+type ResetValues = z.infer<typeof resetSchema>
 
 export function ResetPasswordForm() {
-  const [email, setEmail] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const supabase = createClientComponentClient()
-  const { toast } = useToast()
+  const router = useRouter()
+  const [isLoading, setIsLoading] = React.useState(false)
+  const { supabase } = useSupabase()
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+  const form = useForm<ResetValues>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
+
+  async function onSubmit(data: ResetValues) {
+    setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${location.origin}/auth/callback?type=PASSWORD_RECOVERY`
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${location.origin}/auth/callback?type=PASSWORD_RECOVERY`,
       })
 
-      if (error) throw error
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Şifre sıfırlama başarısız",
+          description: error.message,
+        })
+        return
+      }
 
-      setSuccess("Check your email for the password reset link.")
       toast({
-        title: "Success!",
-        description: "Password reset instructions have been sent to your email.",
+        title: "Şifre sıfırlama bağlantısı gönderildi",
+        description: "E-posta adresinizi kontrol edin.",
       })
-    } catch (err: any) {
-      setError(err.message)
+
+      router.push("/auth/login")
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: err.message,
+        title: "Şifre sıfırlama başarısız",
+        description: "Bir hata oluştu. Lütfen tekrar deneyin.",
       })
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="grid gap-6">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grid gap-4">
-          <div className="grid gap-1">
-            <Label className="text-sm font-medium" htmlFor="email">
-              Email
-            </Label>
+          <div className="grid gap-2">
+            <Label htmlFor="email">E-posta</Label>
             <Input
               id="email"
-              placeholder="name@example.com"
+              placeholder="ornek@firma.com"
               type="email"
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              className="h-11 px-4 border-neutral-200 dark:border-neutral-800 focus:ring-2 focus:ring-offset-1"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              disabled={isLoading}
+              {...form.register("email")}
             />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.email.message}
+              </p>
+            )}
           </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <Icons.alert className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {success && (
-            <Alert>
-              <Icons.check className="h-4 w-4" />
-              <AlertTitle>Success</AlertTitle>
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
-
-          <Button className="h-11 font-medium" disabled={loading}>
-            {loading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-            Reset Password
+          <Button type="submit" disabled={isLoading}>
+            {isLoading && (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Şifre Sıfırlama Bağlantısı Gönder
           </Button>
         </div>
       </form>

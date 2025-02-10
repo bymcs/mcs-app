@@ -1,0 +1,68 @@
+Project Development Rules & Standards
+
+Framework Standards
+- Next.js 15+ with App Router
+- TypeScript implementation required
+- Supabase as backend service
+- TailwindCSS and ShadcN/UI latest versions
+
+Code Architecture
+- Follow App Router directory structure (/app)
+- Use server components by default
+- Implement client components only when needed
+- Maintain route handlers in app/api directory
+- use zod for form validations
+
+Supabase Integration
+- Environment variables must be in .env.local
+- Use Supabase Auth for authentication
+- Implement middleware for route protection
+- Follow Supabase security best practices
+
+Component Guidelines
+- Create reusable components in /components
+- Use ShadcN/UI components with TailwindCSS
+- Implement layout components in app/layout.tsx
+- Follow atomic design principles
+
+Styling Rules
+- Use TailwindCSS for custom styling
+- Maintain consistent theme configuration
+- Follow ShadcN/UI theming guidelines
+- Keep custom CSS minimal
+
+TypeScript Standards
+- Strict type checking enabled
+- Define interfaces for data models
+- Use zod for form validations
+- Maintain types directory for shared types
+
+Authentication Rules
+- Implement Supabase Auth hooks
+- Use middleware for protected routes
+- Handle session management
+- Implement proper error handling
+
+State Management
+- Use React Server Components
+- Implement server actions
+- Use tanstack/react-query for client state
+- Follow Next.js caching guidelines
+
+Performance Guidelines
+- Implement image optimization
+- Use proper loading states
+- Enable streaming where applicable
+- Follow Next.js performance best practices
+
+Documentation
+- Document component props
+- Maintain README.md
+- Comment complex logic
+- Update .env.example
+
+Development Workflow
+- Follow Git commit conventions
+- Review AI generated code
+- Test thoroughly before deployment
+- Keep dependencies updated

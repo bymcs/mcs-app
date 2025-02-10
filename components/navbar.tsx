@@ -65,13 +65,13 @@ export function Navbar({ user: initialUser }: { user: any }) {
             ) : (
               <>
                 <Button variant="outline" asChild>
-                  <Link href="/login" className="flex items-center">
+                  <Link href="/auth/login" className="flex items-center">
                     <Icons.login className="mr-2 h-4 w-4" />
                     Sign In
                   </Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/register" className="flex items-center">
+                  <Link href="/auth/register" className="flex items-center">
                     <Icons.userplus className="mr-2 h-4 w-4" />
                     Sign Up
                   </Link>

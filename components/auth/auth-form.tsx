@@ -133,7 +133,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
           {type === "login" && (
             <div className="flex items-center justify-end">
               <Link
-                href="/reset-password"
+                href="/auth/reset-password"
                 className="text-sm font-medium text-primary hover:underline"
               >
                 Forgot password?
@@ -184,14 +184,14 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         {type === "login" ? (
           <>
             Don't have an account?{" "}
-            <Link href="/register" className="font-medium text-primary hover:underline">
+            <Link href="/auth/register" className="font-medium text-primary hover:underline">
               Sign up
             </Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link href="/auth/login" className="font-medium text-primary hover:underline">
               Sign in
             </Link>
           </>

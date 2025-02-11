@@ -16,4 +16,6 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
+# Coolify için gerekli ayarları ekleyin
+ENV COOLIFY=true
 CMD ["node", "server.js"]

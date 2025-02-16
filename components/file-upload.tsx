@@ -1,63 +1,105 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { useToast } from "@/hooks/use-toast" // Doğru import yolu
-import { toast as toastify } from "react-hot-toast";
+import { X, Upload, FileIcon } from "lucide-react"
+import toast from 'react-hot-toast'
+import { cn } from "@/lib/utils"
 
+interface UploadedFile {
+    name: string;
+    size: number;
+    type: string;
+    progress: number;
+}
 
 export function FileUpload() {
-    const [files, setFiles] = useState<string[]>([]);
+    const [files, setFiles] = useState<UploadedFile[]>([]);
+    const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const { toast } = useToast();
 
-    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const onDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
+        setIsDragging(true);
+    }, []);
 
-        try {
-            const formData = new FormData(e.currentTarget);
-            const fileInput = formData.get('file') as File;
+    const onDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+    }, []);
 
-            // File selection validation
-            if (!fileInput || fileInput.size === 0) {
-                toastify.error("Please select a file to upload");
-                return;
-            }
+    const onDrop = useCallback(async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        handleFiles(droppedFiles);
+    }, []);
 
-            // File size validation (example: 5MB limit)
-            if (fileInput.size > 5 * 1024 * 1024) {
-                toastify.error("File size exceeds the limit of 5MB");
-                return;
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const selectedFiles = Array.from(e.target.files);
+            handleFiles(selectedFiles);
+        }
+    };
+
+    const handleFiles = async (selectedFiles: File[]) => {
+        for (const file of selectedFiles) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error(`${file.name} exceeds the 5MB limit`);
+                continue;
             }
 
             setUploading(true);
+            const newFile: UploadedFile = {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                progress: 0,
+            };
 
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            });
-            
-            const data = await response.json();
+            setFiles(prev => [...prev, newFile]);
 
-            // Hata durumlarının kontrolü
-            if (!response.ok)
-                throw new Error(data.error || response.statusText);
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
 
-            if (data.fileName) {
-                setFiles(prev => [...prev, data.fileName]);
-                toastify.success(`File "${data.fileName}" uploaded successfully`);
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
 
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || response.statusText);
+                }
+
+                setFiles(prev => 
+                    prev.map(f => 
+                        f.name === file.name 
+                            ? { ...f, progress: 100 } 
+                            : f
+                    )
+                );
+
+                toast.success(`${file.name} uploaded successfully`);
+
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+                toast.error(errorMessage);
+
+                setFiles(prev => prev.filter(f => f.name !== file.name));
             }
-
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-            toastify.error(errorMessage);
-        } finally {
-            setUploading(false);
         }
+        setUploading(false);
+    };
+
+    const removeFile = (fileName: string) => {
+        setFiles(prev => prev.filter(file => file.name !== fileName));
     };
 
     return (
@@ -66,24 +108,60 @@ export function FileUpload() {
                 <CardTitle>File Upload</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={onSubmit} className="space-y-4">
-                    <Input type="file" name="file" disabled={uploading} />
-                    <Button type="submit" disabled={uploading}>
-                        {uploading ? 'Uploading...' : 'Upload'}
-                    </Button>
-                </form>
+                <div
+                    className={cn(
+                        "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer",
+                        isDragging ? "border-primary bg-primary/10" : "border-muted",
+                        uploading && "pointer-events-none opacity-60"
+                    )}
+                    onDragOver={onDragOver}
+                    onDragLeave={onDragLeave}
+                    onDrop={onDrop}
+                    onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                >
+                    <Input
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileInput}
+                        disabled={uploading}
+                        multiple
+                    />
+                    <div className="flex flex-col items-center gap-2">
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                            Drag & drop files here, or click to select files
+                        </p>
+                    </div>
+                </div>
+
                 {files.length > 0 && (
-                    <div className="mt-4">
-                        <h3 className="font-medium">Uploaded Files:</h3>
-                        <ul className="list-disc pl-4">
-                            {files.map((file, index) => (
-                                <li key={index}>{file}</li>
-                            ))}
-                        </ul>
+                    <div className="mt-6 space-y-4">
+                        {files.map((file) => (
+                            <div
+                                key={file.name}
+                                className="flex items-center gap-4 rounded-lg border p-4"
+                            >
+                                <FileIcon className="h-8 w-8 text-muted-foreground" />
+                                <div className="flex-1 space-y-1">
+                                    <p className="text-sm font-medium">{file.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {(file.size / 1024).toFixed(2)} KB
+                                    </p>
+                                    <Progress value={file.progress} className="h-1" />
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeFile(file.name)}
+                                    disabled={uploading}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
                     </div>
                 )}
             </CardContent>
         </Card>
-        
     )
 }

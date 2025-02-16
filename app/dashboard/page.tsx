@@ -3,6 +3,9 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileUpload } from "@/components/file-upload"
+import { ModeToggle } from "@/components/mode-toggle"
+import CaseStudyCard from "@/components/receipt"
 
 export default async function DashboardPage() {
   try {
@@ -34,7 +37,22 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
           
-          {/* Add more cards for different dashboard sections */}
+          <FileUpload />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Statistics</CardTitle>
+              <CardDescription>Your activity overview</CardDescription>
+            </CardHeader>
+            <CardContent>
+            <CaseStudyCard
+  image="https://images.unsplash.com/photo-1675285410608-ddd6bb430b19?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  link="https://BYMCS.com"
+  type="simple-image"
+/>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     )

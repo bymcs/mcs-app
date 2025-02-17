@@ -39,6 +39,9 @@ export default async function DashboardPage() {
               <Link href="/dashboard/tasks/">
                 <Button>Task Page</Button>
               </Link>
+              <Link href="/dashboard/contacts/">
+                <Button>Contacts Page</Button>
+              </Link>
             </CardContent>
           </Card>
 

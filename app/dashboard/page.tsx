@@ -7,6 +7,7 @@ import { FileUpload } from "@/components/file-upload"
 import { ModeToggle } from "@/components/mode-toggle"
 import CaseStudyCard from "@/components/receipt"
 import Link from "next/link"
+import { RainbowButton } from "@/components/ui/rainbow-button"
 
 export default async function DashboardPage() {
   try {
@@ -36,11 +37,8 @@ export default async function DashboardPage() {
               <Link href="/dashboard/test/">
                 <Button>Test Page</Button>
               </Link>
-              <Link href="/dashboard/tasks/">
-                <Button>Task Page</Button>
-              </Link>
               <Link href="/dashboard/contacts/">
-                <Button>Contacts Page</Button>
+                <RainbowButton className="h-9 w-15 border-r-0">Contacts</RainbowButton>
               </Link>
             </CardContent>
           </Card>

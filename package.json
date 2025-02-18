@@ -46,6 +46,7 @@
     "react-phone-number-input": "^3.4.11",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "vercel": "^41.1.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {

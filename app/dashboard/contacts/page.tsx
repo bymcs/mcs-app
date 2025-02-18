@@ -12,13 +12,6 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { count } from "console";
 import { z } from "zod";
 
-// Form doğrulama şeması
-const newContactSchema = z.object({
-  name: z.string().min(1, "İsim gerekli"),
-  phone: z.string().min(10, "Telefon numarası geçersiz"),
-  email: z.string().email("Geçersiz e-posta"),
-});
-
 export interface Contact {
   id: string;
   name: string;
@@ -41,13 +34,7 @@ export default function ContactsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Form verilerini doğrula
-    const validationResult = newContactSchema.safeParse(newContact);
-    if (!validationResult.success) {
-      alert(validationResult.error.errors[0].message);
-      return;
-    }
-    
+
     const contact: Contact = {
       id: Date.now().toString(),
       ...newContact,

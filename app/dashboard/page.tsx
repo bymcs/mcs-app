@@ -1,30 +1,44 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileUpload } from "@/components/file-upload"
-import { ModeToggle } from "@/components/mode-toggle"
-import CaseStudyCard from "@/components/receipt"
-import Link from "next/link"
-import { RainbowButton } from "@/components/ui/rainbow-button"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { FileUpload } from "@/components/file-upload";
+import { ModeToggle } from "@/components/mode-toggle";
+import CaseStudyCard from "@/components/receipt";
+import Link from "next/link";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { ScratchToRevealDemo } from "@/components/scratch";
 
 export default async function DashboardPage() {
   try {
-    const cookieStore = cookies()
-    const supabase = createServerComponentClient({ cookies: () => cookieStore })
+    const cookieStore = cookies();
+    const supabase = createServerComponentClient({
+      cookies: () => cookieStore,
+    });
 
-    const { data: { session } } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
     if (!session) {
-      redirect("/login")
+      redirect("/login");
     }
+    const handleComplete = () => {};
 
     return (
       <div className="container mx-auto p-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {session.user.email}</p>
+          <p className="text-muted-foreground">
+            Welcome back, {session.user.email}
+          </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -38,7 +52,9 @@ export default async function DashboardPage() {
                 <Button>Test Page</Button>
               </Link>
               <Link href="/dashboard/contacts/">
-                <RainbowButton className="h-9 w-15 border-r-0">Contacts</RainbowButton>
+                <RainbowButton className="h-9 w-15 border-r-0">
+                  Contacts
+                </RainbowButton>
               </Link>
             </CardContent>
           </Card>
@@ -59,11 +75,19 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle>ScratchToReveal</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScratchToRevealDemo />
+            </CardContent>
+          </Card>
         </div>
       </div>
-    )
+    );
   } catch (error) {
-    console.error('Error in dashboard:', error)
-    redirect("/login")
+    console.error("Error in dashboard:", error);
+    redirect("/login");
   }
 }

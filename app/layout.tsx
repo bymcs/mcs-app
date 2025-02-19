@@ -39,16 +39,12 @@ export default async function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       <head>
         {/* ...existing meta tags... */}
-        <meta 
-          name="viewport" 
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
       </head>
       <body className={`${inter.className} antialiased min-h-screen bg-background`}>
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

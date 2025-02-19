@@ -44,7 +44,6 @@ const ScratchToRevealDemo = () => {
         className="flex items-center justify-center overflow-hidden rounded-2xl border-4 border-gray-300 bg-gray-400 bg-[url('/scratch-texture.png')] touch-none"
         onComplete={handleComplete}
         gradientColors={["#A0A0A0", "#C0C0C0", "#E0E0E0"]}
-        brushSize={40} // Mobil için daha büyük fırça
       >
         <div className="flex flex-col items-center justify-center h-full w-full bg-green-500 rounded-2xl">
           <p className="text-6xl select-none">💵</p>

@@ -1,12 +1,11 @@
 'use client';
 
 import { createContext, useContext, useEffect } from 'react';
-import { useToast } from "@/hooks/use-toast";
+import { toast  } from "react-hot-toast";
 
 export const ErrorContext = createContext(null);
 
 export function ErrorProvider({ children }: { children: React.ReactNode }) {
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -19,12 +18,7 @@ export function ErrorProvider({ children }: { children: React.ReactNode }) {
           .replace(/\+/g, ' ')
           .replace(/%20/g, ' ');
 
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: formattedDescription,
-          duration: 5000
-        });
+        toast.error(formattedDescription);
 
         // URL'i temizle
         window.history.replaceState(null, '', window.location.pathname);
